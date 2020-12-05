@@ -1,0 +1,22 @@
+# Everything the developer needs in addition to the production requirements
+-r prod.txt
+
+# Testing
+coverage
+pep8
+pylint
+flake8
+pyflakes
+mccabe
+splinter
+ipython
+selenium
+mock
+factory_boy
+pytest
+pytest-cov
+pytest-bdd
+pytest-splinter
+pyopenssl
+tox
+watchdog
