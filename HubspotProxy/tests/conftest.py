@@ -23,8 +23,6 @@ from HubspotProxy.app import create_app
 from HubspotProxy.config.database import db
 
 
-# XXX: when object is created, call ensure_indexes,
-# then indexes is set on recreated database.
 def ensure_indexes(sender, document, **kwargs):
     document.ensure_indexes()
 
@@ -37,8 +35,6 @@ class Db(object):
         self.application = application
 
     def clean(self):
-        # XXX: sice smaze vsechny data, ale pri tvorbe nove dtb uz nevytvori spravne indexy
-        # smazeme vsechny vytvorene kolekce
         dtb = db.connection[self.application.config['MONGODB_SETTINGS']['DB']]
         if (self.application.config['MONGODB_SETTINGS']['USERNAME'] and
                 self.application.config['MONGODB_SETTINGS']['PASSWORD']):
@@ -113,9 +109,10 @@ def simple_browser(client):
 def db(request, app):
     db = Db(application=app)
 
-    request.addfinalizer(db.clean)
-
-    return db
+    # request.addfinalizer(db.clean)
+    yield db
+    db.clean()
+    #return db
 
 
 class Server(object):

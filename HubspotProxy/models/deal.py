@@ -7,3 +7,4 @@ class Deal(db.Document):
     stage = db.StringField(max_length=50, required=True)
     date = db.StringField(max_length=50, required=True)
     amount = db.IntField(required=True)
+
