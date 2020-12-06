@@ -18,8 +18,7 @@ class BaseConfig(object):
 
     SECRET_KEY = getenv('SECRET_KEY')
 
-    # Databases uri string (e.g. mongodb://localhost/wsys)
-    MONGODB_SETTINGS = get_dtb_config(getenv('DATABASE_URL'))
+    MONGODB_SETTINGS = get_dtb_config('mongodb://localhost/hubspot')
 
 
 class Production(BaseConfig):

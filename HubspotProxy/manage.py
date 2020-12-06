@@ -4,7 +4,7 @@ import sys
 import urllib.parse
 
 from flask import url_for
-from flask.ext.script import (
+from flask_script import (
     Manager,
     Server
 )
