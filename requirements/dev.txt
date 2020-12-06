@@ -17,6 +17,5 @@ pytest
 pytest-cov
 pytest-bdd
 pytest-splinter
-pyopenssl
 tox
 watchdog
