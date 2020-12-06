@@ -61,7 +61,7 @@ class Endpoint(metaclass=ABCMeta):
                 response = hubspot_api.fetch_data(url)
                 assert response.status_code == 200
             except Exception as e:
-                raise FetchEndpointError() from e
+                raise FetchEndpointError(response.text) from e
 
             json_data = response.json()
             response_data.extend(json_data[self.__class__.__name__.lower()])
