@@ -4,6 +4,10 @@ import pytest
 
 from services.hubspot.endpoints.deals import Deals
 from services.hubspot.endpoints.endpoint import Endpoint
+from services.hubspot.endpoints.exceptions import (
+    FetchEndpointError,
+    UnregisterdEndpoint
+)
 
 
 @pytest.fixture
@@ -60,3 +64,13 @@ def test_deals_fetch_data(mocked_deals_response):
     response = deal_endpoint.fetch_data(mocked_hubspot_api)
     assert len(response) == 1
     assert set(response[0].keys()) == {'dealname', 'amount', 'dealstage', 'createdate', 'deal_id'}
+
+
+def test_deals_fetch_data_error(mocked_deals_response):
+    deal_endpoint = Endpoint.create('deals')
+    mocked_response = mock.MagicMock()
+    mocked_response.status_code = 404
+    mocked_hubspot_api = mock.MagicMock()
+    mocked_hubspot_api.fetch_data.return_value = mocked_response
+    with pytest.raises(FetchEndpointError):
+        deal_endpoint.fetch_data(mocked_hubspot_api)

@@ -5,14 +5,10 @@ from abc import (
 
 from furl import furl
 
-
-class UnregisterdEndpoint(Exception):
-    pass
-
-
-class FetchEndpointError(Exception):
-    pass
-
+from .exceptions import (
+    FetchEndpointError,
+    UnregisterdEndpoint
+)
 
 class Endpoint(metaclass=ABCMeta):
     """

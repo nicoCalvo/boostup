@@ -51,3 +51,8 @@ def test_callback_fetch_token(db, client):
 def test_get_deals(db, mocked_hubspot_api, token, client):
     response = client.get('https://localhost:9999/deals')
     assert response.status_code == 200
+
+
+def test_reset_flow(client):
+    response = client.post('https://localhost:9999/reset_flow')
+    assert response.status_code == 302
