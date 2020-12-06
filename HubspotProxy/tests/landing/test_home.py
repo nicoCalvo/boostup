@@ -17,7 +17,7 @@ def test_renew_token(db, client):
     Token(**token_data).save()
     redirect_url = client.get('https://localhost:9999/')
     assert redirect_url.status_code == 302
-    assert redirect_url.headers['location'] == 'http://localhost:9999/deals'
+    assert redirect_url.headers['location'] == 'https://localhost:9999/deals'
 
 
 @mock.patch('landing.home.HubSpotApi.get_new_token', return_value={'refresh_token': '', 'access_token': '',
@@ -39,4 +39,4 @@ def test_renew_token_error_db(db, client):
 def test_callback_fetch_token(db, client):
     redirect_url = client.get('https://localhost:9999/callback')
     assert redirect_url.status_code == 302
-    assert redirect_url.headers['location'] == 'http://localhost:9999/deals'
+    assert redirect_url.headers['location'] == 'https://localhost:9999/deals'

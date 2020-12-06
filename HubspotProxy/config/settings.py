@@ -36,7 +36,5 @@ class Testing(BaseConfig):
     '''
     Testing settings.
     '''
-
     TESTING = True
-
-    MONGODB_SETTINGS = get_dtb_config("mongodb://localhost/HubspotProxy_test")
+    MONGODB_SETTINGS = get_dtb_config("mongodb://localhost/hubspot_test")

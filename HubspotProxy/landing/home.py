@@ -86,4 +86,3 @@ def deals():
         logger.exception(f'Error accessing requested endpoint {deal_endpoint.get_url()}')
         abort(500)
     return render_template('deals.html', deals=json.loads(Deal.objects().to_json()))
-

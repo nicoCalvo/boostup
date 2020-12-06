@@ -59,8 +59,8 @@ class Deals(Endpoint):
         for deal in response:
             deal['properties'].keys()
             deal_data = {x: deal['properties'][x]['value'] for x in deal['properties']}
-            timestamp_date = datetime.fromtimestamp(int(deal_data['createdate'])/1000.0)
+            timestamp_date = datetime.fromtimestamp(int(deal_data['createdate']) / 1000.0)
             deal_data['createdate'] = timestamp_date.strftime('%c')
             deal_data['deal_id'] = deal['dealId']
             deals.append(deal_data)
-        return deals            
+        return deals
