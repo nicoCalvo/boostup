@@ -10,9 +10,7 @@ pyflakes
 mccabe
 splinter
 ipython
-selenium
 mock
-factory_boy
 pytest
 pytest-cov
 pytest-bdd

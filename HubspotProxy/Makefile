@@ -6,7 +6,7 @@ testserver:
 
 
 test:
-	coverage run -m pytest  -s
+	python -m pytest --cov=./
 
 urls:
 	FLASK_APP='HubspotProxy.app' flask routes
