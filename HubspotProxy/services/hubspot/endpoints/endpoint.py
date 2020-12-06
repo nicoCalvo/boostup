@@ -19,14 +19,12 @@ class Endpoint(metaclass=ABCMeta):
     Base class to interact with HubSpot API
     and fetch data in json format
     """
-    PAGINATED = False
     BASE_URL = 'https://api.hubapi.com/'
     SCOPE = None  # scope of the endpoint
     LIMIT_SECS = 10
     LIMIT_AMOUNT = 100
     EXTRA_PARAMS = {'limit': 100}
     PATH = None  # path for each endpoint
-
 
     @abstractmethod
     def _get_custom_params(self, furl):
@@ -44,7 +42,7 @@ class Endpoint(metaclass=ABCMeta):
     def get_registered_scopes(cls):
         return {klass.SCOPE for klass in cls.__subclasses__()}
 
-    def get_url(self, offset):
+    def get_url(self, offset=0):
         f = furl(self.BASE_URL)
         f /= self.PATH
         f.args = self.EXTRA_PARAMS

@@ -55,7 +55,7 @@ def get():
 def callback():
     """
     Step 2 of OAuth2 process. This callback is requested by the HubSpot Api on the redirect response.
-    
+
     The token can now be fetched using the code provided on the redirect call received.
 
     Once the token is persisted, the redirect for deals endpoint is returned
@@ -87,7 +87,7 @@ def deals():
     try:
         hubspot_api = HubSpotApi(token)
         deal_endpoint = Endpoint.create('deals')
-        response = deal_endpoint.fetch_data(hubspot_api)
+        response = deal_endpoint.fetch_data(hubspot_api=hubspot_api)
         Deal.objects.all().delete()
         deals = [Deal(**data) for data in response]
         Deal.objects.insert(deals, load_bulk=False)
@@ -97,10 +97,8 @@ def deals():
     return render_template('deals.html', deals=json.loads(Deal.objects().to_json()))
 
 
-
 @home_page.route("/reset_flow", methods=["POST"])
 def reset_flow():
     Token.objects.all().delete()
     Deal.objects.all().delete()
     return redirect(url_for('home_page.get'))
-

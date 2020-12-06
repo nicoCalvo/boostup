@@ -58,4 +58,3 @@ def client(app):
 def db(request, app):
     db = Db(application=app)
     yield db
-    db.clean()
