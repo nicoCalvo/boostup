@@ -1,0 +1,21 @@
+<h1>Deals</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Stage</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for deal in deals %}
+        <tr>
+            <td>{{ deal.deal_id }}</td>
+            <td>{{ deal.dealname }}</td>
+            <td>{{ deal.amount }}</td>
+            <td>{{ deal.dealstage }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,9 +1,6 @@
 import logging
 
-from oauthlib.oauth2 import (
-    MissingTokenError,
-    InsecureTransportError
-)
+from oauthlib.oauth2 import TokenExpiredError
 from requests_oauthlib import OAuth2Session
 
 from services.hubspot.constants import (
@@ -15,15 +12,18 @@ from services.hubspot.exceptions import (
     AuthorizationError
 )
 
+from services.hubspot.endpoints.endpoint import Endpoint
 
 logger = logging.getLogger(__name__)
 
 
 class HubSpotApi:
-    ALLOWED_SCOPES = {'contacts'}
     AUTH_URL = 'https://app.hubspot.com/oauth/authorize'
     CSRF_STATE = 'random_string'
     TOKEN_URL = 'https://api.hubapi.com/oauth/v1/token'
+
+    def __init__(self, token):
+        self._token = token
 
     @classmethod
     def get_auth_url(cls, auth_callback_url, scopes):
@@ -41,8 +41,7 @@ class HubSpotApi:
             InvalidScope: Invalid scope provided
 
         """
-
-        if invalid_scopes := set(scopes) - cls.ALLOWED_SCOPES:
+        if invalid_scopes := set(scopes) - Endpoint.get_registered_scopes():
             raise InvalidScope(invalid_scopes)
 
         hubspot = OAuth2Session(client_id=CLIENT_ID, scope=scopes, redirect_uri=auth_callback_url)
@@ -90,10 +89,22 @@ class HubSpotApi:
             AuthorizationError: Any auhentication/authorization related error with HubSpot Api
 
         """
-        hubspot=OAuth2Session(CLIENT_ID, token = refresh_token)
+        hubspot = OAuth2Session(CLIENT_ID, token=refresh_token)
         try:
-            return hubspot.refresh_token(token_url = cls.TOKEN_URL, refresh_token = refresh_token,
-                                         client_id = CLIENT_ID, client_secret = CLIENT_SECRET)
+            return hubspot.refresh_token(token_url=cls.TOKEN_URL, refresh_token=refresh_token,
+                                         client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
         except Exception as e:
             logging.exception('Error fetching new access token')
             raise AuthorizationError() from e
+
+    def fetch_data(self, url):
+        hubspot = OAuth2Session(CLIENT_ID, token=self._token.to_mongo())
+        try:
+            return hubspot.get(url)
+        except TokenExpiredError:
+            token_data = self.get_new_token(self._token.refresh_token)
+            self._token.update(**token_data).save()
+            self.fetch_data(url)
+        except Exception:
+            logger.exception(f'Unable to fetch request from the url {url}')
+
