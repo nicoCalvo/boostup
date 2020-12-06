@@ -30,6 +30,12 @@ SCOPES = ['contacts']
 
 @home_page.route('/')
 def get():
+    """
+    landing endpoint for start the OAuth2 process.
+    The auth url with the registered callback is returned to the user
+    to call the HubSpot and authorize the data fetching.
+
+    """
     token = Token.objects.first()
     if token is None:
         auth_url = HubSpotApi.get_auth_url(AUTH_REDIRECT_URL, SCOPES)
@@ -47,6 +53,13 @@ def get():
 
 @home_page.route("/callback", methods=["GET"])
 def callback():
+    """
+    Step 2 of OAuth2 process. This callback is requested by the HubSpot Api on the redirect response.
+    
+    The token can now be fetched using the code provided on the redirect call received.
+
+    Once the token is persisted, the redirect for deals endpoint is returned
+    """
     code = request.values.get("code")
     token = HubSpotApi.fetch_token(code=code, auth_resp_url=request.url, auth_callback_url=AUTH_REDIRECT_URL)
     try:
@@ -61,21 +74,17 @@ def callback():
 def deals():
     """
     Deals endpoint fetches all deals in HubSpot API
-    If token is not valid nor present, the data it's considered obsolete and
-    new deals are pulled from the API.
-
+    Data is pulled every time from the API and stored to MongoDb.
+    Then is restored back and returned as table template
     """
     token = Token.objects.first()
     if token is None:
-        Deal.objects.all().delete()
         return redirect(url_for('home_page.get'))
     elif not token.is_valid():
-        Deal.objects.all().delete()
         new_token = HubSpotApi.get_new_token(token.refresh_token)
         token.update(**new_token)
         token.save()
     try:
-        Deal.objects.all().delete()
         hubspot_api = HubSpotApi(token)
         deal_endpoint = Endpoint.create('deals')
         response = deal_endpoint.fetch_data(hubspot_api)
@@ -86,3 +95,12 @@ def deals():
         logger.exception(f'Error accessing requested endpoint {deal_endpoint.get_url()}')
         abort(500)
     return render_template('deals.html', deals=json.loads(Deal.objects().to_json()))
+
+
+
+@home_page.route("/reset_flow", methods=["POST"])
+def reset_flow():
+    Token.objects.all().delete()
+    Deal.objects.all().delete()
+    return redirect(url_for('home_page.get'))
+
