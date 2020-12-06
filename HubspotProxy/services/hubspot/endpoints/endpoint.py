@@ -23,12 +23,10 @@ class Endpoint(metaclass=ABCMeta):
     BASE_URL = 'https://api.hubapi.com/'
     SCOPE = None  # scope of the endpoint
     LIMIT_SECS = 10
-    LIMIT_AMOUNT = 1
+    LIMIT_AMOUNT = 100
     EXTRA_PARAMS = {'limit': 100}
     PATH = None  # path for each endpoint
 
-    def __init__(self):
-        self._offset = 0
 
     @abstractmethod
     def _get_custom_params(self, furl):
@@ -46,12 +44,12 @@ class Endpoint(metaclass=ABCMeta):
     def get_registered_scopes(cls):
         return {klass.SCOPE for klass in cls.__subclasses__()}
 
-    def get_url(self):
+    def get_url(self, offset):
         f = furl(self.BASE_URL)
         f /= self.PATH
         f.args = self.EXTRA_PARAMS
         f.args['limit'] = self.LIMIT_AMOUNT
-        f.args['offset'] = self._offset
+        f.args['offset'] = offset
         self._get_custom_params(f)
         return f.url
 
@@ -59,8 +57,8 @@ class Endpoint(metaclass=ABCMeta):
     def _parse_response(self, json_data):
         pass
 
-    def fetch_data(self, hubspot_api, response_data=[]):
-        url = self.get_url()
+    def fetch_data(self, hubspot_api, offset=0, response_data=[]):
+        url = self.get_url(offset)
         try:
             response = hubspot_api.fetch_data(url)
             assert response.status_code == 200
@@ -68,7 +66,6 @@ class Endpoint(metaclass=ABCMeta):
             raise FetchEndpointError() from e
         json_data = response.json()
         response_data.extend(json_data[self.__class__.__name__.lower()])
-        self._offset = json_data['offset']
         if json_data['hasMore']:
-            self.fetch_data(hubspot_api, response_data)
+            self.fetch_data(hubspot_api, offset=json_data['offset'], response_data=response_data)
         return self._parse_response(response_data)
