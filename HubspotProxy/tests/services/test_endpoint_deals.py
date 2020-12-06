@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 from services.hubspot.endpoints.deals import Deals
@@ -6,7 +8,7 @@ from services.hubspot.endpoints.endpoint import Endpoint
 
 @pytest.fixture
 def mocked_deals_response():
-    return [
+    return {'deals': [
         {'portalId': 8946942, 'dealId': 3569506599, 'isDeleted': False, 'associations': None,
          'properties': {
              'dealname': {
@@ -39,17 +41,22 @@ def mocked_deals_response():
                                 }
                            ]
                            },
-            'createdate': {
+             'createdate': {
                  'value': '1607247864523',
-            }
+             }
          },
-          'imports': [], 'stateChanges': [],
-          'hasMore': True, 'offset': 3569506600}
-    ]
+         'imports': [], 'stateChanges': []}],
+        'hasMore': False, 'offset': 3569506600
+    }
 
 
-def test_deals_parsing(mocked_deals_response):
+def test_deals_fetch_data(mocked_deals_response):
     deal_endpoint = Endpoint.create('deals')
-    response = deal_endpoint._parse_response(mocked_deals_response)
+    mocked_response = mock.MagicMock()
+    mocked_response.status_code = 200
+    mocked_response.json.return_value = mocked_deals_response
+    mocked_hubspot_api = mock.MagicMock()
+    mocked_hubspot_api.fetch_data.return_value = mocked_response
+    response = deal_endpoint.fetch_data(mocked_hubspot_api)
     assert len(response) == 1
     assert set(response[0].keys()) == {'dealname', 'amount', 'dealstage', 'createdate', 'deal_id'}
