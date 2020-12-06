@@ -1,10 +1,12 @@
+from datetime import datetime
+
 from .endpoint import Endpoint
 
 
 class Deals(Endpoint):
     SCOPE = 'contacts'
     PATH = f'deals/v1/deal/paged'
-    PROPERTIES = ('dealname', 'dealstage', 'amount')
+    PROPERTIES = ('dealname', 'dealstage', 'amount', 'createdate')
 
     def _get_custom_params(self, furl):
         for property in self.PROPERTIES:
@@ -55,7 +57,10 @@ class Deals(Endpoint):
         """
         deals = []
         for deal in response:
+            deal['properties'].keys()
             deal_data = {x: deal['properties'][x]['value'] for x in deal['properties']}
+            timestamp_date = datetime.fromtimestamp(int(deal_data['createdate'])/1000.0)
+            deal_data['createdate'] = timestamp_date.strftime('%c')
             deal_data['deal_id'] = deal['dealId']
             deals.append(deal_data)
         return deals            

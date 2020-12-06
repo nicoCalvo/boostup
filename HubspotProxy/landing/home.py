@@ -75,6 +75,7 @@ def deals():
         token.update(**new_token)
         token.save()
     try:
+        Deal.objects.all().delete()
         hubspot_api = HubSpotApi(token)
         deal_endpoint = Endpoint.create('deals')
         response = deal_endpoint.fetch_data(hubspot_api)
