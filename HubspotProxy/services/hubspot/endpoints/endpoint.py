@@ -10,6 +10,7 @@ from .exceptions import (
     UnregisterdEndpoint
 )
 
+
 class Endpoint(metaclass=ABCMeta):
     """
     Base class to interact with HubSpot API
@@ -51,15 +52,18 @@ class Endpoint(metaclass=ABCMeta):
     def _parse_response(self, json_data):
         pass
 
-    def fetch_data(self, hubspot_api, offset=0, response_data=[]):
-        url = self.get_url(offset)
-        try:
-            response = hubspot_api.fetch_data(url)
-            assert response.status_code == 200
-        except Exception as e:
-            raise FetchEndpointError() from e
-        json_data = response.json()
-        response_data.extend(json_data[self.__class__.__name__.lower()])
-        if json_data['hasMore']:
-            self.fetch_data(hubspot_api, offset=json_data['offset'], response_data=response_data)
+    def fetch_data(self, hubspot_api, offset=0):
+        response_data = []
+        has_more = True
+        while has_more:
+            try:
+                url = self.get_url(offset)
+                response = hubspot_api.fetch_data(url)
+                assert response.status_code == 200
+            except Exception as e:
+                raise FetchEndpointError() from e
+
+            json_data = response.json()
+            response_data.extend(json_data[self.__class__.__name__.lower()])
+            has_more = json_data['hasMore']
         return self._parse_response(response_data)
