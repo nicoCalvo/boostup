@@ -93,6 +93,7 @@ def deals():
         Deal.objects.insert(deals, load_bulk=False)
     except Exception:
         logger.exception(f'Error accessing requested endpoint {deal_endpoint.get_url()}')
+        Token.objects.all().delete()
         abort(500)
     return render_template('deals.html', deals=json.loads(Deal.objects().to_json()))
 
