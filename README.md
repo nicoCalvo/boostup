@@ -38,3 +38,6 @@ App Test Account 1
 ```
 
 This account is allowed to pull contacts scope related data, other account will fail to connect the service with Hubspot's API.
+
+
+_NOTE_: A test email was created due to some times the Hubspot site ask for a login when the device/IP where we try to access is new, and send a verification code to such email, therefore, this account allows to check the email for that code.
