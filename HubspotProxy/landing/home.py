@@ -9,7 +9,6 @@ from flask import (
     request,
     url_for,
 )
-#from jinja2 import TemplateNotFound
 
 from models.deal import Deal
 from models.token import Token
@@ -45,7 +44,7 @@ def get():
             new_token = HubSpotApi.get_new_token(token.refresh_token)
             token.update(**new_token)
             token.save()
-        except:
+        except Exception:
             logger.exception('Error updating access token')
             abort(500)
     return redirect(url_for('.deals'))
@@ -64,7 +63,7 @@ def callback():
     token = HubSpotApi.fetch_token(code=code, auth_resp_url=request.url, auth_callback_url=AUTH_REDIRECT_URL)
     try:
         Token(**token).save()
-    except:
+    except Exception:
         logger.exception('Error storing new token')
         abort(500)
     return redirect(url_for('.deals'))
