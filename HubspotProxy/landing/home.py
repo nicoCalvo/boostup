@@ -90,11 +90,12 @@ def deals():
         response = deal_endpoint.fetch_data(hubspot_api=hubspot_api)
         Deal.objects.all().delete()
         deals = [Deal(**data) for data in response]
-        Deal.objects.insert(deals, load_bulk=False)
+        if deals:
+            Deal.objects.insert(deals, load_bulk=False)
     except Exception:
         logger.exception(f'Error accessing requested endpoint {deal_endpoint.get_url()}')
         Token.objects.all().delete()
-        abort(500)
+        return redirect(url_for('home_page.get'))
     return render_template('deals.html', deals=json.loads(Deal.objects().to_json()))
 
 

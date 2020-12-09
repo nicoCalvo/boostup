@@ -17,10 +17,9 @@ def test_invalid_scope():
 
 def test_get_auth_url():
     resp = HubSpotApi.get_auth_url(auth_callback_url='https://localhost', scopes=['contacts'])
-
     expected_url = ''.join(['https://app.hubspot.com/oauth/authorize?',
-                            'response_type=code&client_id=320ef51b-19f',
-                            '3-4a1d-a42b-dee347f4eeed&redirect_uri=htt',
+                            'response_type=code&client_id=105c5a0a-0ea',
+                            'f-41de-ba45-58350a44c82a&redirect_uri=htt',
                             'ps%3A%2F%2Flocalhost&scope=contacts&state=random_string'
                             ])
     assert resp == expected_url
